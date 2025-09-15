@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify SDK Test - Beats & Repeats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1db954;
+            text-align: center;
+        }
+        .setup-required {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .step {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            background-color: #fdf2f2;
+        }
+        .step.success {
+            border-color: #27ae60;
+            background-color: #f2fdf2;
+        }
+        .step.info {
+            border-color: #3498db;
+            background-color: #f2f8fd;
+        }
+        button {
+            background-color: #1db954;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 200px;
+        }
+        button:hover {
+            background-color: #1aa34a;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef5350;
+        }
+        .status.success {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        .status.info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #2196f3;
+        }
+        .credentials {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            border-left: 4px solid #1db954;
+        }
+        .instructions {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #1db954;
+            margin: 20px 0;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .token-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Spotify SDK Test - GitHub Pages</h1>
+        
+        <div class="setup-required">
+            <h3>🔧 Setup Required Before Testing:</h3>
+            <ol>
+                <li><strong>Register Spotify App</strong>: Go to <a href="https://developer.spotify.com/dashboard" target="_blank">Spotify Developer Dashboard</a></li>
+                <li><strong>App Settings</strong>:
+                    <ul>
+                        <li>Name: "Beats & Repeats Test"</li>
+                        <li>Website: https://yourusername.github.io</li>
+                        <li>Redirect URI: <code>https://yourusername.github.io/beats-repeats-test/</code></li>
+                    </ul>
+                </li>
+                <li><strong>Copy Client ID</strong> and paste it in the box below</li>
+                <li><strong>Spotify Premium Required</strong> for Web Playback SDK</li>
+            </ol>
+        </div>
+
+        <!-- Client ID Configuration -->
+        <div class="step info" id="configStep">
+            <h3>Step 1: Configure Spotify App Credentials</h3>
+            <p>Enter your Spotify Client ID from the developer dashboard:</p>
+            <input type="text" id="clientIdInput" placeholder="Paste your Spotify Client ID here" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <button id="setClientId">Set Client ID</button>
+            <div id="configStatus" class="status info">Enter your Spotify Client ID to begin testing</div>
+            
+            <div class="credentials">
+                <strong>Current Configuration:</strong><br>
+                <strong>Test URL:</strong> <span id="currentUrl">Loading...</span><br>
+                <strong>Protocol:</strong> <span id="currentProtocol">Loading...</span><br>
+                <strong>Client ID:</strong> <span id="displayClientId">Not set</span>
+            </div>
+        </div>
+
+        <!-- Step 1: SDK Loading -->
+        <div class="step" id="sdkStep">
+            <h3>Step 2: Load Spotify Web Playback SDK</h3>
+            <button id="loadSDK" disabled>Load Spotify SDK</button>
+            <div id="sdkStatus" class="status info">Set Client ID first</div>
+        </div>
+
+        <!-- Step 2: Authentication -->
+        <div class="step" id="authStep">
+            <h3>Step 3: Authenticate with Spotify</h3>
+            <button id="authenticate" disabled>Authenticate with Spotify</button>
+            <div id="authStatus" class="status info">Load SDK first</div>
+            <div class="token-display" id="tokenDisplay" style="display: none;">
+                <strong>Access Token:</strong> <span id="accessTokenDisplay">None</span>
+            </div>
+        </div>
+
+        <!-- Step 3: Player Initialization -->
+        <div class="step" id="playerStep">
+            <h3>Step 4: Initialize Spotify Player</h3>
+            <button id="initPlayer" disabled>Initialize Player</button>
+            <div id="playerStatus" class="status info">Authentication required first</div>
+            <div class="credentials" id="deviceInfo" style="display: none;">
+                <strong>Device ID:</strong> <span id="deviceId">Not connected</span><br>
+                <strong>Device Name:</strong> Beats & Repeats Test<br>
+                <strong>Status:</strong> <span id="connectionStatus">Disconnected</span><br>
+                <strong>Volume:</strong> <span id="playerVolume">50%</span>
+            </div>
+        </div>
+
+        <!-- Step 4: Audio Capture Test -->
+        <div class="step" id="audioStep">
+            <h3>Step 5: Test Audio Capture (Critical Test)</h3>
+            <button id="testAudioCapture" disabled>Test Audio Capture</button>
+            <div id="audioStatus" class="status info">Player must be active and playing music</div>
+            <div class="instructions">
+                <strong>Testing Instructions:</strong><br>
+                1. Open Spotify app (mobile or desktop)<br>
+                2. Start playing any song<br>
+                3. Select "Beats & Repeats Test" as your playback device<br>
+                4. Verify music is playing through this device<br>
+                5. Click "Test Audio Capture" to check if we can access the audio stream
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="credentials">
+            <h3>🔍 Test Results Summary:</h3>
+            <div id="testResults">
+                <p><strong>Client ID Setup:</strong> <span id="configResult">Not completed</span></p>
+                <p><strong>SDK Loading:</strong> <span id="sdkResult">Not tested</span></p>
+                <p><strong>Authentication:</strong> <span id="authResult">Not tested</span></p>
+                <p><strong>Player Creation:</strong> <span id="playerResult">Not tested</span></p>
+                <p><strong>Audio Capture:</strong> <span id="audioResult">Not tested</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let spotifyPlayer = null;
+        let deviceId = null;
+        let accessToken = null;
+        let clientId = null;
+
+        // Display current URL and protocol
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('currentProtocol').textContent = window.location.protocol + '//' + window.location.host;
+
+        // Update results display
+        function updateResult(test, status) {
+            const element = document.getElementById(test + 'Result');
+            if (element) {
+                element.textContent = status;
+                element.style.color = status.includes('SUCCESS') ? '#27ae60' : 
+                                     status.includes('FAILED') ? '#c62828' : '#856404';
+            }
+        }
+
+        // Set Client ID
+        document.getElementById('setClientId').addEventListener('click', () => {
+            const input = document.getElementById('clientIdInput');
+            clientId = input.value.trim();
+            
+            if (!clientId) {
+                document.getElementById('configStatus').textContent = '❌ Please enter a valid Client ID';
+                document.getElementById('configStatus').className = 'status error';
+                return;
+            }
+            
+            document.getElementById('displayClientId').textContent = clientId;
+            document.getElementById('configStatus').textContent = '✅ Client ID configured successfully!';
+            document.getElementById('configStatus').className = 'status success';
+            document.getElementById('configStep').className = 'step success';
+            document.getElementById('loadSDK').disabled = false;
+            updateResult('config', 'SUCCESS - Client ID set');
+        });
+
+        // Load Spotify SDK
+        document.getElementById('loadSDK').addEventListener('click', () => {
+            const status = document.getElementById('sdkStatus');
+            status.textContent = 'Loading Spotify Web Playback SDK...';
+            status.className = 'status info';
+
+            const script = document.createElement('script');
+            script.src = 'https://sdk.scdn.co/spotify-player.js';
+            script.onload = () => {
+                status.textContent = '✅ Spotify SDK loaded successfully!';
+                status.className = 'status success';
+                document.getElementById('sdkStep').className = 'step success';
+                document.getElementById('authenticate').disabled = false;
+                updateResult('sdk', 'SUCCESS - SDK loaded');
+            };
+            script.onerror = () => {
+                status.textContent = '❌ Failed to load Spotify SDK.';
+                status.className = 'status error';
+                updateResult('sdk', 'FAILED - Could not load SDK');
+            };
+            document.head.appendChild(script);
+        });
+
+        // Authentication
+        document.getElementById('authenticate').addEventListener('click', () => {
+            if (!clientId) {
+                alert('Please set Client ID first!');
+                return;
+            }
+
+            const redirectUri = window.location.href;
+            const scopes = 'streaming user-read-email user-read-private';
+            
+            const authUrl = `https://accounts.spotify.com/authorize?` +
+                `client_id=${clientId}&` +
+                `response_type=token&` +
+                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                `scope=${encodeURIComponent(scopes)}&` +
+                `show_dialog=true`;
+
+            window.location.href = authUrl;
+        });
+
+        // Initialize Player
+        document.getElementById('initPlayer').addEventListener('click', () => {
+            const status = document.getElementById('playerStatus');
+            status.textContent = 'Initializing Spotify Player...';
+            status.className = 'status info';
+
+            if (!accessToken || typeof window.Spotify === 'undefined') {
+                status.textContent = '❌ Missing requirements. Check authentication and SDK loading.';
+                status.className = 'status error';
+                return;
+            }
+
+            try {
+                spotifyPlayer = new window.Spotify.Player({
+                    name: 'Beats & Repeats Test',
+                    getOAuthToken: cb => { cb(accessToken); },
+                    volume: 0.5
+                });
+
+                spotifyPlayer.addListener('ready', ({ device_id }) => {
+                    deviceId = device_id;
+                    status.textContent = '✅ Player ready! Device available in Spotify.';
+                    status.className = 'status success';
+                    document.getElementById('playerStep').className = 'step success';
+                    document.getElementById('deviceInfo').style.display = 'block';
+                    document.getElementById('deviceId').textContent = device_id;
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('testAudioCapture').disabled = false;
+                    updateResult('player', 'SUCCESS - Device created');
+                });
+
+                spotifyPlayer.addListener('not_ready', ({ device_id }) => {
+                    status.textContent = '⚠️ Player disconnected.';
+                    status.className = 'status error';
+                });
+
+                spotifyPlayer.connect();
+
+            } catch (error) {
+                status.textContent = `❌ Player failed: ${error.message}`;
+                status.className = 'status error';
+                updateResult('player', `FAILED - ${error.message}`);
+            }
+        });
+
+        // Test Audio Capture
+        document.getElementById('testAudioCapture').addEventListener('click', () => {
+            const status = document.getElementById('audioStatus');
+            status.textContent = 'Testing audio capture...';
+            status.className = 'status info';
+
+            if (spotifyPlayer) {
+                spotifyPlayer.getCurrentState().then(state => {
+                    if (!state || state.paused) {
+                        status.textContent = '⚠️ Start playing music in Spotify and select this device.';
+                        status.className = 'status error';
+                        return;
+                    }
+
+                    status.textContent = `🎵 Playing: "${state.track_window.current_track.name}"`;
+                    
+                    // Critical test: Can we capture audio?
+                    setTimeout(() => {
+                        status.innerHTML += '<br><br>🔍 <strong>TESTING AUDIO CAPTURE...</strong><br>';
+                        
+                        // Test system audio capture (same limitation as before)
+                        navigator.mediaDevices.getDisplayMedia({ 
+                            video: false, 
+                            audio: true 
+                        }).then(stream => {
+                            status.innerHTML += '• ✅ System audio capture possible<br>';
+                            status.innerHTML += '<br><strong>RESULT:</strong> Same limitation as before - requires system audio capture<br>';
+                            updateResult('audio', 'SAME LIMITATION - System audio capture required');
+                            stream.getTracks().forEach(track => track.stop());
+                        }).catch(error => {
+                            status.innerHTML += '• ❌ System audio capture failed<br>';
+                            status.innerHTML += '<br><strong>RESULT:</strong> No audio capture possible<br>';
+                            updateResult('audio', 'FAILED - No audio capture');
+                        });
+                    }, 1000);
+
+                }).catch(error => {
+                    status.textContent = `❌ Failed: ${error.message}`;
+                    status.className = 'status error';
+                });
+            }
+        });
+
+        // Check for authentication token
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                const token = params.get('access_token');
+                
+                if (token) {
+                    accessToken = token;
+                    document.getElementById('accessTokenDisplay').textContent = token.substring(0, 20) + '...';
+                    document.getElementById('tokenDisplay').style.display = 'block';
+                    document.getElementById('authStatus').textContent = '✅ Authentication successful!';
+                    document.getElementById('authStatus').className = 'status success';
+                    document.getElementById('authStep').className = 'step success';
+                    document.getElementById('initPlayer').disabled = false;
+                    updateResult('auth', 'SUCCESS - Token received');
+                    history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        });
+    </script>
+</body>
+</html>To use this:Copy the entire code above (everything from <!DOCTYPE html> to </html>)In your GitHub repository, click "Add file" → "Create new file"Name it: index.htmlPaste the codeClick "Commit new file"Then enable GitHub Pages and you'll have your test site live!Need me to walk through any of these steps?
