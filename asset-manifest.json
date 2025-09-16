@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/beats-repeats-test/static/css/main.a4b7c422.css",
+    "main.js": "/beats-repeats-test/static/js/main.cc4cc836.js",
+    "static/js/453.712ff45a.chunk.js": "/beats-repeats-test/static/js/453.712ff45a.chunk.js",
+    "index.html": "/beats-repeats-test/index.html",
+    "main.a4b7c422.css.map": "/beats-repeats-test/static/css/main.a4b7c422.css.map",
+    "main.cc4cc836.js.map": "/beats-repeats-test/static/js/main.cc4cc836.js.map",
+    "453.712ff45a.chunk.js.map": "/beats-repeats-test/static/js/453.712ff45a.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a4b7c422.css",
+    "static/js/main.cc4cc836.js"
+  ]
+}
